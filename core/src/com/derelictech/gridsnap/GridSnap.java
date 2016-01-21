@@ -7,10 +7,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.derelictech.gridsnap.assets.Grid;
+import com.derelictech.gridsnap.assets.NodeGrid;
+import com.derelictech.gridsnap.assets.Selector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class GridSnap extends ApplicationAdapter {
 
     List<Grid> gridList;
     Vector2 mouse;
-    Circle circle;
+    Selector selector;
 
 	@Override
 	public void create () {
@@ -30,10 +31,10 @@ public class GridSnap extends ApplicationAdapter {
 
         gridList = new ArrayList<Grid>();
         mouse = new Vector2(0, 0);
-        circle = new Circle(0, 0, 5);
+        selector = new Selector(0, 0, 5);
 
-        gridList.add(new Grid(50, 50, 250, 250, 5, 5, new Color(0, 1, 0, 1)));
-        gridList.add(new Grid(400, 50, 100, 400, 10, 40, new Color(1, 0, 0, 1)));
+        gridList.add(new NodeGrid(50, 50, 250, 250, 5, 5, new Color(0, 1, 0, 1)));
+        gridList.add(new NodeGrid(400, 50, 100, 400, 10, 40, new Color(1, 0, 0, 1)));
         gridList.add(new Grid(50, 400, 200, 50, 10, 5, new Color(0, 0, 1, 1)));
         gridList.add(new Grid(535, 200, 35, 150, 2, 5, new Color(0.7f, 0, 0.7f, 1)));
         gridList.add(new Grid(50, 350, 10, 10, 5, 5, new Color(1, 1, 1, 1)));
@@ -49,29 +50,43 @@ public class GridSnap extends ApplicationAdapter {
         // Logics
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
-            public boolean mouseMoved(int x, int y){
-                mouse.x = x;
-                mouse.y = Gdx.graphics.getHeight() - y;
+            public boolean mouseMoved(int screenX, int screenY){
+                mouse.x = screenX;
+                mouse.y = Gdx.graphics.getHeight() - screenY;
+                selector.collisionBox.setPosition(mouse.x, mouse.y);
+                return true;
+            }
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                for(Grid g : gridList) {
+                    if(selector.collisionBox.overlaps(g)) {
+                        g.clicked(screenX, Gdx.graphics.getHeight() - screenY, pointer, button);
+                        break;
+                    }
+                }
                 return true;
             }
         });
 
         for(Grid g : gridList) {
-            if(new Rectangle(mouse.x - 5f, mouse.y - 5f, 10, 10).overlaps(g)) {
-                circle.set(g.snap(mouse), 5);
+            if(selector.collisionBox.overlaps(g)) {
+                selector.setVisible(true);
+                selector.setPosition(g.snap(mouse));
                 break;
+            }
+            else {
+                selector.setVisible(false);
             }
         }
 
-		// Renders
-        for(Grid g : gridList) {
-            g.render(shape_renderer);
-        }
-
+        // Renders
         shape_renderer.setAutoShapeType(true);
         shape_renderer.begin();
-        shape_renderer.setColor(new Color(1, 0, 0, 1));
-        shape_renderer.circle(circle.x, circle.y, 5);
+        for(Grid g : gridList) {
+            g.render_steps(shape_renderer);
+        }
+        selector.render_steps(shape_renderer);
         shape_renderer.end();
 
 		// Test
