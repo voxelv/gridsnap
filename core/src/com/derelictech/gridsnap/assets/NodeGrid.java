@@ -2,11 +2,8 @@ package com.derelictech.gridsnap.assets;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.model.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +20,27 @@ public class NodeGrid extends Grid {
         super(x, y, width, height, x_cells, y_cells, c);
 
         nodes = new ArrayList<Node>();
+    }
+
+    @Override
+    public Vector2 snap(Vector2 pos) {
+        return snap(pos.x, pos.y);
+    }
+
+    public Vector2 snap(float pos_x, float pos_y) {
+        Vector2 v = new Vector2();
+
+        v.x = (float) ((int) (pos_x - this.x + (this.cell_w / 2)) / (int) this.cell_w);
+        v.x *= this.cell_w;
+
+        v.y = (float) ((int) (pos_y - this.y + (this.cell_h / 2)) / (int) this.cell_h);
+        v.y *= this.cell_h;
+
+        if(v.x > this.width) v.x = this.width;
+        if(v.y > this.height) v.y = this.height;
+
+        v.add(this.x, this.y);
+        return v;
     }
 
     private void addNode(int grid_x, int grid_y) {
@@ -52,7 +70,7 @@ public class NodeGrid extends Grid {
     }
 
     @Override
-    public void clicked(int screenX, int screenY, int pointer, int button) {
+    public void clicked(float screenX, float screenY, int pointer, int button) {
         if(button == Input.Buttons.LEFT) {
             addNode(gridCoordFromPos(snap(screenX, screenY)));
         }

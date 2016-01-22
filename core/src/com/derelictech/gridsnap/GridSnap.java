@@ -5,13 +5,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.derelictech.gridsnap.assets.Grid;
-import com.derelictech.gridsnap.assets.NodeGrid;
-import com.derelictech.gridsnap.assets.Selector;
+import com.derelictech.gridsnap.assets.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,25 +17,30 @@ import java.util.List;
 public class GridSnap extends ApplicationAdapter {
 	ShapeRenderer shape_renderer;
 	SpriteBatch batch;
+    public BitmapFont font;
 
     List<Grid> gridList;
+    public Printable textArea;
     Vector2 mouse;
     Selector selector;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
+        font = new BitmapFont();
+        font.setColor(Color.RED);
 		shape_renderer = new ShapeRenderer();
 
         gridList = new ArrayList<Grid>();
+        textArea = new Printable("", 200, 23);
         mouse = new Vector2(0, 0);
-        selector = new Selector(0, 0, 5);
+        selector = new Selector();
 
-        gridList.add(new NodeGrid(50, 50, 250, 250, 5, 5, new Color(0, 1, 0, 1)));
-        gridList.add(new NodeGrid(400, 50, 100, 400, 10, 40, new Color(1, 0, 0, 1)));
-        gridList.add(new Grid(50, 400, 200, 50, 10, 5, new Color(0, 0, 1, 1)));
-        gridList.add(new Grid(535, 200, 35, 150, 2, 5, new Color(0.7f, 0, 0.7f, 1)));
-        gridList.add(new Grid(50, 350, 10, 10, 5, 5, new Color(1, 1, 1, 1)));
+        gridList.add(new TileGrid(50, 50, 250, 250, 5, 5, new Color(0, 1, 0, 1)));
+        gridList.add(new TileGrid(400, 50, 100, 400, 10, 40, new Color(1, 0, 0, 1)));
+        gridList.add(new NodeGrid(50, 400, 200, 50, 10, 5, new Color(0, 0, 1, 1)));
+        gridList.add(new NodeGrid(535, 200, 35, 150, 2, 5, new Color(0.7f, 0, 0.7f, 1)));
+        gridList.add(new NodeGrid(50, 350, 10, 10, 5, 5, new Color(1, 1, 1, 1)));
 	}
 
 	@Override
@@ -54,6 +57,31 @@ public class GridSnap extends ApplicationAdapter {
                 mouse.x = screenX;
                 mouse.y = Gdx.graphics.getHeight() - screenY;
                 selector.collisionBox.setPosition(mouse.x, mouse.y);
+                boolean onGrid = false;
+                for(Grid g : gridList) {
+                    if(selector.collisionBox.overlaps(g)) {
+                        onGrid = true;
+                        if(g instanceof NodeGrid) {
+                            selector.setNodeSelectVisible(true);
+                            selector.setTileSelectVisible(false);
+                            selector.setPosition(g.snap(mouse));
+                            textArea.str = "NodeGrid";
+                        }
+                        else if(g instanceof TileGrid) {
+                            selector.setNodeSelectVisible(false);
+                            selector.setTileSelectVisible(true);
+                            selector.setPosition(g.snap(mouse));
+                            selector.tileSelect.set(selector.position.x, selector.position.y, g.cell_w, g.cell_h);
+                            selector.setPosition(g.snap(mouse));
+                            textArea.str = "TileGrid";
+                        }
+                    }
+                }
+                if(!onGrid) {
+                    textArea.str = "";
+                    selector.setNodeSelectVisible(false);
+                    selector.setTileSelectVisible(false);
+                }
                 return true;
             }
 
@@ -69,18 +97,7 @@ public class GridSnap extends ApplicationAdapter {
             }
         });
 
-        for(Grid g : gridList) {
-            if(selector.collisionBox.overlaps(g)) {
-                selector.setVisible(true);
-                selector.setPosition(g.snap(mouse));
-                break;
-            }
-            else {
-                selector.setVisible(false);
-            }
-        }
-
-        // Renders
+        // ShapeRenderer
         shape_renderer.setAutoShapeType(true);
         shape_renderer.begin();
         for(Grid g : gridList) {
@@ -89,7 +106,9 @@ public class GridSnap extends ApplicationAdapter {
         selector.render_steps(shape_renderer);
         shape_renderer.end();
 
-		// Test
+        // SpriteBatch
+        batch.begin();
+        font.draw(batch, textArea.str +" "+ selector.isNodeSelectVisible() +" "+ selector.isTileSelectVisible(), textArea.pos.x, textArea.pos.y);
+        batch.end();
 	}
-
 }
