@@ -1,6 +1,7 @@
 package com.derelictech.gridsnap.assets;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 /**
@@ -45,5 +46,11 @@ public class Node extends Vector2{
 
     public void setRadius(int r) {
         this.radius = r;
+    }
+
+    public void render_steps(ShapeRenderer sr) {
+        sr.set(ShapeRenderer.ShapeType.Filled);
+        sr.setColor(color);
+        sr.circle(this.x, this.y, this.radius);
     }
 }

@@ -30,7 +30,7 @@ public class NodeGrid extends Grid {
             if(n.gridCoords.x == grid_x && n.gridCoords.y == grid_y) return;
         }
 
-        Node n = new Node(grid_x, grid_y);
+        Node n = new Node(grid_x, grid_y, this.x + (grid_x * cell_w), this.y + (grid_y * cell_h));
         n.setColor(nodecolor.sub(0.01f, 0.02f, 0.03f, 1));
         n.setRadius(5);
         nodes.add(n);
@@ -47,9 +47,7 @@ public class NodeGrid extends Grid {
         Vector2 nodepos;
         sr.set(ShapeRenderer.ShapeType.Filled);
         for(Node node : nodes) {
-            sr.setColor(node.getColor());
-            nodepos = PosFromGridCoord(node);
-            sr.circle(nodepos.x, nodepos.y, node.getRadius());
+            node.render_steps(sr);
         }
     }
 
