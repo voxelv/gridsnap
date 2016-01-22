@@ -7,14 +7,20 @@ import com.badlogic.gdx.math.Vector2;
  * Created by Tim on 1/21/2016.
  */
 public class Node extends Vector2{
+    public Vector2 gridCoords;
     private Color color;
     private boolean visible = false;
     private int radius = 6;
 
-    public Node(float x, float y) {
+    public Node(int grid_x, int grid_y, float x, float y) {
         super(x, y);
+        gridCoords = new Vector2(grid_x, grid_y);
         color = new Color(Color.WHITE);
         visible = true;
+    }
+
+    public Node(int grid_x, int grid_y, Vector2 pos) {
+        this(grid_x, grid_y, pos.x, pos.y);
     }
 
     public void setColor(Color c) {

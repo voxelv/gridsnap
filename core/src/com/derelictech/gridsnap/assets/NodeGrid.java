@@ -27,7 +27,7 @@ public class NodeGrid extends Grid {
 
     private void addNode(int grid_x, int grid_y) {
         for(Node n : nodes){
-            if(n.x == grid_x && n.y == grid_y) return;
+            if(n.gridCoords.x == grid_x && n.gridCoords.y == grid_y) return;
         }
 
         Node n = new Node(grid_x, grid_y);
