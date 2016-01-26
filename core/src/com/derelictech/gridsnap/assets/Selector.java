@@ -13,7 +13,7 @@ import com.derelictech.gridsnap.GridSnap;
 public class Selector {
     public Rectangle collisionBox;
 
-    private Color color = Color.YELLOW;
+    private Color color;
 
     public Vector2 position;
 
@@ -25,6 +25,8 @@ public class Selector {
 
     public Selector() {
         this.position = new Vector2(0, 0);
+
+        color = new Color(0, 1, 0, 0.2f);
 
         this.nodeSelect = new Circle(position, 5);
         this.tileSelect = new Rectangle(position.x, position.y, 5, 5);

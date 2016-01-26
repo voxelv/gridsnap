@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GridSnap extends ApplicationAdapter {
-	ShapeRenderer shape_renderer;
+	ShapeRenderer sr;
 	SpriteBatch batch;
     public BitmapFont font;
 
@@ -29,7 +29,7 @@ public class GridSnap extends ApplicationAdapter {
 		batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.RED);
-		shape_renderer = new ShapeRenderer();
+		sr = new ShapeRenderer();
 
         gridList = new ArrayList<Grid>();
         textArea = new Printable("", 200, 23);
@@ -98,13 +98,13 @@ public class GridSnap extends ApplicationAdapter {
         });
 
         // ShapeRenderer
-        shape_renderer.setAutoShapeType(true);
-        shape_renderer.begin();
+        sr.setAutoShapeType(true);
+        sr.begin();
         for(Grid g : gridList) {
-            g.render_steps(shape_renderer);
+            g.render_steps(sr);
         }
-        selector.render_steps(shape_renderer);
-        shape_renderer.end();
+        selector.render_steps(sr);
+        sr.end();
 
         // SpriteBatch
         batch.begin();
