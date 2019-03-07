@@ -1,4 +1,4 @@
-package com.derelictech.gridsnap.assets;
+package com.derelictech.gridsnap.util;
 
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
